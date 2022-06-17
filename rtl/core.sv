@@ -1,34 +1,44 @@
 module core (
-    input logic clk,
-    input logic rst_n
+    input logic clk_i,
+    input logic rst_n_i
 );
 
   import types::*;
 
-  word_t pc;
+  word_t pc_o;
   pc pc_inst (
-      .clk_i  (clk),
-      .rst_n_i(rst_n),
-      .pc_o   (pc)
+      .clk_i  (clk_i),
+      .rst_n_i(rst_n_i),
+      .pc_o   (pc_o)
   );
 
-  word_t instr;
+  word_t fetch_pc_o;
+  word_t fetch_instr_o;
   fetch fetch_inst (
-      .clk_i  (clk),
-      .rst_n_i(rst_n),
-      .pc_i   (pc),
-      .instr_o(instr)
+      .clk_i  (clk_i),
+      .rst_n_i(rst_n_i),
+      .pc_i   (pc_o),
+      .pc_o   (fetch_pc_o),
+      .instr_o(fetch_instr_o)
   );
 
-  word_t data_rs1;
-  word_t data_rs2;
-  regfile regfile_inst (
-      .clk_i     (clk),
-      .rst_n_i   (rst_n),
-      .addr_rs1_i(5'd0),
-      .addr_rs2_i(5'd0),
-      .data_rs1_o(data_rs1),
-      .data_rs2_o(data_rs2)
+  word_t decode_pc_i;
+  word_t decode_instr_i;
+  always_ff @(posedge clk_i) begin
+    if (rst_n_i == 0) begin
+      decode_pc_i    <= 0;
+      decode_instr_i <= 0;
+    end else begin
+      decode_pc_i    <= fetch_pc_o;
+      decode_instr_i <= fetch_instr_o;
+    end
+  end
+
+  decode decode_inst (
+      .clk_i  (clk_i),
+      .rst_n_i(rst_n_i),
+      .pc_i   (decode_pc_i),
+      .instr_i(decode_instr_i)
   );
 
 endmodule

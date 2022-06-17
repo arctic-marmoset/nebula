@@ -9,13 +9,13 @@ module core_tb;
   end
 
   clockgen clockgen_inst (
-      .clk  (clk),
-      .rst_n(rst_n)
+      .clk_o  (clk),
+      .rst_n_o(rst_n)
   );
 
   core core_inst (
-      .clk  (clk),
-      .rst_n(rst_n)
+      .clk_i  (clk),
+      .rst_n_i(rst_n)
   );
 
 endmodule

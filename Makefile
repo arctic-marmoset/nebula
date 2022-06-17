@@ -3,16 +3,25 @@ OUTDIR = out
 PROJECT = nebula
 TOP = core_tb
 
-TEST_NAME ?= nop.S
+TEST_NAME ?= add.S
 TEST_PATH := $(CURDIR)/test/input/$(TEST_NAME).hex
 TEST_SIZE := $(shell wc -l < "$(TEST_PATH)")
 
+$(info "TEST_NAME = ${TEST_NAME}")
+$(info "TEST_PATH = ${TEST_PATH}")
+$(info "TEST_SIZE = ${TEST_SIZE}")
+
 # NOTE: Order is important. Packages that are imported must come first.
-RTL =                  \
-	rtl/types.sv   \
-	rtl/pc.sv      \
-	rtl/fetch.sv   \
-	rtl/regfile.sv \
+RTL =                     \
+	rtl/types.sv      \
+	rtl/opcodes.sv    \
+	rtl/assembly.sv   \
+	rtl/addressing.sv \
+	rtl/pc.sv         \
+	rtl/fetch.sv      \
+	rtl/decode.sv     \
+	rtl/imm_gen.sv    \
+	rtl/regfile.sv    \
 	rtl/core.sv
 
 TEST =                   \
@@ -32,6 +41,10 @@ ICARUSFLAGS =          \
 ICARUSDEFINES :=                     \
 	-DTEST_PATH=\"$(TEST_PATH)\" \
 	-DTEST_SIZE=$(TEST_SIZE)
+
+ifdef NDEBUG
+ICARUSFLAGS += -DNDEBUG
+endif
 
 all: $(OUTDIR)/$(PROJECT).vcd
 
