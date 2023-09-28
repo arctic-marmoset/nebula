@@ -9,10 +9,14 @@ module regfile (
 
   import nebula::x_t;
 
-  x_t x[32];
+  localparam unsigned RegisterCount = 32;
+
+  x_t x[RegisterCount];
   always_ff @(posedge clk_i) begin
     if (rst_n_i == 0) begin
-      x[0] <= 0;
+      for (int i = 0; i < RegisterCount; ++i) begin
+        x[i] <= 0;
+      end
     end else begin
       data_rs1_o <= x[addr_rs1_i];
       data_rs2_o <= x[addr_rs2_i];
