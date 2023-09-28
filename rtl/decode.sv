@@ -1,8 +1,10 @@
 module decode (
-    input logic          clk_i,
-    input logic          rst_n_i,
-    input nebula::word_t pc_i,
-    input nebula::word_t instr_i
+    input  logic          clk_i,
+    input  logic          rst_n_i,
+    input  nebula::word_t pc_i,
+    input  nebula::word_t instr_i,
+    output logic [4:0]    addr_rs1_o,
+    output logic [4:0]    addr_rs2_o
 );
 
   import nebula::*;
@@ -13,6 +15,9 @@ module decode (
   logic [4:0] addr_rs2 = instr_i[24:20];
   logic [2:0] funct3   = instr_i[14:12];
   logic [2:0] funct7   = instr_i[31:25];
+
+  assign addr_rs1_o = addr_rs1;
+  assign addr_rs2_o = addr_rs2;
 
   imm_t imm_type;
   always_comb begin

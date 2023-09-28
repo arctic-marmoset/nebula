@@ -34,11 +34,26 @@ module core (
     end
   end
 
+  logic [4:0] decode_addr_rs1_o;
+  logic [4:0] decode_addr_rs2_o;
   decode decode_inst (
-      .clk_i  (clk_i),
-      .rst_n_i(rst_n_i),
-      .pc_i   (decode_pc_i),
-      .instr_i(decode_instr_i)
+    .clk_i  (clk_i),
+    .rst_n_i(rst_n_i),
+    .pc_i   (decode_pc_i),
+    .instr_i(decode_instr_i),
+    .addr_rs1_o(decode_addr_rs1_o),
+    .addr_rs2_o(decode_addr_rs2_o)
+  );
+
+  word_t decode_data_rs1_o;
+  word_t decode_data_rs2_o;
+  regfile regfile_inst (
+    .clk_i     (clk_i),
+    .rst_n_i   (rst_n_i),
+    .addr_rs1_i(decode_addr_rs1_o),
+    .addr_rs2_i(decode_addr_rs2_o),
+    .data_rs1_o(decode_data_rs1_o),
+    .data_rs2_o(decode_data_rs2_o)
   );
 
 endmodule
