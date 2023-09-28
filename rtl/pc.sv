@@ -1,7 +1,7 @@
 module pc (
-    input  logic         clk_i,
-    input  logic         rst_n_i,
-    output types::word_t pc_o
+    input  logic          clk_i,
+    input  logic          rst_n_i,
+    output nebula::word_t pc_o
 );
 
   import addressing::BaseAddress;

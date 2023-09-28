@@ -1,13 +1,13 @@
 module regfile (
-    input  logic            clk_i,
-    input  logic            rst_n_i,
-    input  logic      [4:0] addr_rs1_i,
-    input  logic      [4:0] addr_rs2_i,
-    output types::x_t       data_rs1_o,
-    output types::x_t       data_rs2_o
+    input  logic             clk_i,
+    input  logic             rst_n_i,
+    input  logic      [4:0]  addr_rs1_i,
+    input  logic      [4:0]  addr_rs2_i,
+    output nebula::x_t       data_rs1_o,
+    output nebula::x_t       data_rs2_o
 );
 
-  import types::x_t;
+  import nebula::x_t;
 
   x_t x[32];
   always_ff @(posedge clk_i) begin

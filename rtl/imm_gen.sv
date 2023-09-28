@@ -1,10 +1,10 @@
 module imm_gen (
-    input  types::word_t instr_i,
-    input  types::imm_t  type_i,
-    output types::word_t imm_o
+    input  nebula::word_t instr_i,
+    input  nebula::imm_t  type_i,
+    output nebula::word_t imm_o
 );
 
-  import types::*;
+  import nebula::*;
 
   wire [31:0] imm_i_type = {{20{instr_i[31]}}, instr_i[31:20]};
   wire [31:0] imm_s_type = {{20{instr_i[31]}}, instr_i[31:25], instr_i[11:7]};

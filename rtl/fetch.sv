@@ -7,16 +7,16 @@
 `endif
 
 module fetch (
-    input  logic         clk_i,
-    input  logic         rst_n_i,
-    input  types::word_t pc_i,
+    input  logic          clk_i,
+    input  logic          rst_n_i,
+    input  nebula::word_t pc_i,
 
-    output types::word_t pc_o,
-    output types::word_t instr_o
+    output nebula::word_t pc_o,
+    output nebula::word_t instr_o
 );
 
   import addressing::BaseAddress;
-  import types::word_t;
+  import nebula::word_t;
 
   logic [7:0] instr_bytes[`TEST_SIZE];
   initial begin

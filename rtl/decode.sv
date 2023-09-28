@@ -1,11 +1,11 @@
 module decode (
-    input logic         clk_i,
-    input logic         rst_n_i,
-    input types::word_t pc_i,
-    input types::word_t instr_i
+    input logic          clk_i,
+    input logic          rst_n_i,
+    input nebula::word_t pc_i,
+    input nebula::word_t instr_i
 );
 
-  import types::*;
+  import nebula::*;
 
   wire [6:0] opcode   = instr_i[ 6: 0];
   wire [4:0] addr_rd  = instr_i[11: 7];

@@ -3,7 +3,7 @@ module core (
     input logic rst_n_i
 );
 
-  import types::*;
+  import nebula::*;
 
   word_t pc_o;
   pc pc_inst (

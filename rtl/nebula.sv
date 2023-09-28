@@ -1,4 +1,4 @@
-package types;
+package nebula;
 
   typedef logic [63:0] dword_t;
   typedef logic [31:0] word_t;

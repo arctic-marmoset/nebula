@@ -1,6 +1,6 @@
 package assembly;
 
-  import types::word_t;
+  import nebula::word_t;
 
   function static string to_string(
     word_t       pc,

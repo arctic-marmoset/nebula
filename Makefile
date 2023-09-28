@@ -12,8 +12,8 @@ $(info "TEST_PATH = ${TEST_PATH}")
 $(info "TEST_SIZE = ${TEST_SIZE}")
 
 # NOTE: Order is important. Packages that are imported must come first.
-RTL =                     \
-	rtl/types.sv      \
+RTL =                   \
+	rtl/nebula.sv     \
 	rtl/opcodes.sv    \
 	rtl/assembly.sv   \
 	rtl/addressing.sv \
