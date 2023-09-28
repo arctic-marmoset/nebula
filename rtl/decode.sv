@@ -7,12 +7,12 @@ module decode (
 
   import nebula::*;
 
-  wire [6:0] opcode   = instr_i[ 6: 0];
-  wire [4:0] addr_rd  = instr_i[11: 7];
-  wire [4:0] addr_rs1 = instr_i[19:15];
-  wire [4:0] addr_rs2 = instr_i[24:20];
-  wire [2:0] funct3   = instr_i[14:12];
-  wire [2:0] funct7   = instr_i[31:25];
+  logic [6:0] opcode   = instr_i[ 6: 0];
+  logic [4:0] addr_rd  = instr_i[11: 7];
+  logic [4:0] addr_rs1 = instr_i[19:15];
+  logic [4:0] addr_rs2 = instr_i[24:20];
+  logic [2:0] funct3   = instr_i[14:12];
+  logic [2:0] funct7   = instr_i[31:25];
 
   imm_t imm_type;
   always_comb begin

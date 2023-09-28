@@ -23,7 +23,7 @@ module fetch (
     $readmemh(`TEST_PATH, instr_bytes, 0, `TEST_SIZE - 1);
   end
 
-  wire [31:0] address = pc_i - BaseAddress;
+  logic [31:0] address = pc_i - BaseAddress;
 `ifndef NDEBUG
   always_ff @(posedge clk_i) begin
     if (rst_n_i == 1) begin
@@ -32,7 +32,7 @@ module fetch (
   end
 `endif
 
-  wire [31:0] instr = {
+  logic [31:0] instr = {
     instr_bytes[address+3],
     instr_bytes[address+2],
     instr_bytes[address+1],
