@@ -10,8 +10,6 @@ module fetch (
     input  logic          clk_i,
     input  logic          rst_n_i,
     input  nebula::word_t pc_i,
-
-    output nebula::word_t pc_o,
     output nebula::word_t instr_o
 );
 
@@ -39,7 +37,6 @@ module fetch (
     instr_bytes[address]
   };
 
-  assign pc_o = pc_i;
   assign instr_o = instr;
 
 `ifndef NDEBUG
