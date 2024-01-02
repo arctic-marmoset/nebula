@@ -1,6 +1,8 @@
-CC = riscv64-elf-gcc
-OBJCOPY = riscv64-elf-objcopy
-OBJDUMP = riscv64-elf-objdump
+PREFIX = riscv64-elf-
+
+CC = $(PREFIX)gcc
+OBJCOPY = $(PREFIX)objcopy
+OBJDUMP = $(PREFIX)objdump
 OD = od
 
 SOURCES = $(filter-out startup.S,$(wildcard *.S)) $(wildcard *.cpp)
