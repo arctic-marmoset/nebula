@@ -1,11 +1,15 @@
 OUTPUT_ARCH(riscv)
 ENTRY(_start)
 
+ROM_ORIGIN = 0x00001000;
+ROM_LENGTH = 128 * 1024 * 1024;
+
 RAM_ORIGIN = 0x80000000;
 RAM_LENGTH = 8 * 1024 * 1024 * 1024;
 
 MEMORY
 {
+	rom (rx) : ORIGIN = ROM_ORIGIN, LENGTH = ROM_LENGTH
 	ram (rwx) : ORIGIN = RAM_ORIGIN, LENGTH = RAM_LENGTH
 }
 
@@ -19,33 +23,33 @@ SECTIONS
 	  	*(SORT(.text.sorted*))
 	  	*(.text)
 		*(.text.*)
-	} > ram AT > ram
+	} > rom AT > rom
 
 	.rodata :
 	{
 		*(.rodata)
 		*(.rodata.*)
-	} > ram AT > ram
+	} > rom AT > rom
 
 	.tdata :
 	{
 		*(.tdata)
 		*(.tdata.*)
-	} > ram AT > ram
+	} > rom AT > ram
 
 	.tbss :
 	{
 		*(.tbss)
 		*(.tbss.*)
 		*(.tcommon)
-	} > ram AT > ram
+	} > rom AT > ram
 
 	.data :
 	{
 		__DATA_BEGIN__ = .;
 		*(.data)
 		*(.data.*)
-	} > ram AT > ram
+	} > rom AT > ram
 
 	.sdata :
 	{
@@ -58,7 +62,7 @@ SECTIONS
 		*(.srodata.*)
 		*(.sdata)
 		*(.sdata.*)
-	} > ram AT > ram
+	} > rom AT > ram
 
 	__BSS_START__ = .;
 	.sbss :
@@ -66,14 +70,14 @@ SECTIONS
 		*(.sbss)
 		*(.sbss.*)
 		*(.scommon)
-	} > ram AT > ram
- 
+	} > rom AT > ram
+
 	.bss :
 	{
 		*(.bss)
 		*(.bss.*)
 		. = ALIGN(. != 0 ? 64 / 8 : 1);
-	} > ram AT > ram
+	} > rom AT > ram
 
 	. = ALIGN(64 / 8);
 	. = SEGMENT_START("ldata-segment", .);

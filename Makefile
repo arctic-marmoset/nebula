@@ -1,66 +1,60 @@
 OUTDIR = out
 
 PROJECT = nebula
+
+RTLDIR = rtl
+SIMDIR = sim
 TOP = core_tb
 
+SRC = \
+	rtl/core.sv \
+	rtl/fetch_stage.sv \
+	rtl/decode_stage.sv \
+	rtl/control_unit.sv \
+	rtl/immediate_generator.sv \
+	rtl/register_file.sv \
+	sim/core_tb.sv \
+	sim/clockgen.sv
+
 TEST_NAME ?= add.S
-TEST_PATH := $(CURDIR)/test/input/$(TEST_NAME).hex
+TEST_PATH := $(CURDIR)/test/$(TEST_NAME).hex
 TEST_SIZE := $(shell wc -l < "$(TEST_PATH)")
 
-$(info "TEST_NAME = ${TEST_NAME}")
-$(info "TEST_PATH = ${TEST_PATH}")
-$(info "TEST_SIZE = ${TEST_SIZE}")
+MODULE_DIRS = \
+	$(RTLDIR) \
+	$(SIMDIR)
 
-# NOTE: Order is important. Packages that are imported must come first.
-RTL =                   \
-	rtl/nebula.sv     \
-	rtl/opcodes.sv    \
-	rtl/assembly.sv   \
-	rtl/addressing.sv \
-	rtl/pc.sv         \
-	rtl/fetch.sv      \
-	rtl/decode.sv     \
-	rtl/imm_gen.sv    \
-	rtl/regfile.sv    \
-	rtl/core.sv
+# TODO: Remove -Wno-fatal.
+VERILATORFLAGS = \
+	--binary \
+	-Wall \
+	-Wno-fatal \
+	--trace-fst \
+	--timescale 1ns/1ns \
+	--Mdir $(OUTDIR) \
+	$(addprefix -y , ${MODULE_DIRS})
 
-TEST =                   \
-	test/clockgen.sv \
-	test/core_tb.sv
-
-SOURCES :=      \
-	$(RTL)  \
-	$(TEST)
-
-ICARUSFLAGS =          \
-	-g2012         \
-	-gassertions   \
-	-Wall          \
-	-Wno-timescale
-
-ICARUSDEFINES :=                     \
+VERILATORDEFINES := \
 	-DTEST_PATH=\"$(TEST_PATH)\" \
 	-DTEST_SIZE=$(TEST_SIZE)
 
-ifdef NDEBUG
-ICARUSFLAGS += -DNDEBUG
+ifdef SYNTEHSIS
+VERILATORFLAGS += -DSYNTHESIS
 endif
 
-all: $(OUTDIR)/$(PROJECT).vcd
+BINARY = V$(TOP)
 
-debug: $(OUTDIR)/$(PROJECT)
-	vvp -i -s -l $(OUTDIR)/icarus.log $^
-	mv $(PROJECT).vcd $(OUTDIR)
+all: $(OUTDIR)/$(PROJECT).fst
 
-$(OUTDIR)/$(PROJECT).vcd: $(OUTDIR)/$(PROJECT)
-	vvp -n -l $(OUTDIR)/icarus.log $^ -fst
-	mv $(PROJECT).vcd $(OUTDIR)
+$(OUTDIR)/$(PROJECT).fst: $(OUTDIR)/$(BINARY)
+	$(info TEST_NAME = ${TEST_NAME})
+	$(info TEST_PATH = ${TEST_PATH})
+	$(info TEST_SIZE = ${TEST_SIZE} Bytes)
+	$(OUTDIR)/$(BINARY)
+	mv $(PROJECT).fst $(OUTDIR)
 
-$(OUTDIR)/$(PROJECT): $(SOURCES) | $(OUTDIR)
-	iverilog $(ICARUSFLAGS) $(ICARUSDEFINES) -s$(TOP) $^ -o $@
-
-$(OUTDIR):
-	mkdir -p $(OUTDIR)
+$(OUTDIR)/$(BINARY): $(SRC)
+	verilator $(VERILATORFLAGS) $(VERILATORDEFINES) $(TOP).sv
 
 clean:
 	rm -rf $(OUTDIR)
