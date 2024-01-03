@@ -47,7 +47,7 @@ module register_file #(
       for (int read_index = 0; read_index < ReadPortCount; ++read_index) begin
         if (
           write_valid[write_index] &&
-            read_address_i[read_index] != 'd0 &&
+            write_i[write_index].address != '0 &&
             read_address_i[read_index] == write_i[write_index].address
         ) begin
           read_data[read_index] = write_i[write_index].data;

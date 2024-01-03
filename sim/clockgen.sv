@@ -6,6 +6,7 @@ module clockgen (
   localparam unsigned MaxCycleCount = 16 * 1024;
 
   localparam unsigned ResetToggleCount = ResetCycleCount * 2;
+  localparam unsigned MaxToggleCount = MaxCycleCount * 2;
 
   initial begin
     clk_o = 0;
@@ -21,10 +22,10 @@ module clockgen (
   always #1 clk_o = ~clk_o;
   /* verilator lint_on BLKSEQ */
 
-  int unsigned cycle_count = 0;
+  int unsigned toggle_count = 0;
   always_ff @(posedge clk_o) begin
-    cycle_count <= cycle_count + 1;
-    if (cycle_count == MaxCycleCount) begin
+    toggle_count <= toggle_count + 1;
+    if (toggle_count == MaxToggleCount) begin
       $finish;
     end
   end
