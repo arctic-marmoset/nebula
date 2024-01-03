@@ -34,7 +34,7 @@ typedef enum logic [4:0] {
   REG_T4,
   REG_T5,
   REG_T6
-} register_t;
+} register_e;
 
 // Packed structs are difficult to debug in GTKWave.
 `ifndef SYNTHESIS
@@ -45,7 +45,7 @@ typedef enum logic [4:0] {
 
 typedef struct `NEBULA_SYNTHESIS_PACKED {
   logic        enable;
-  register_t   address;
+  register_e   address;
   logic [31:0] data;
 } register_file_write_t;
 

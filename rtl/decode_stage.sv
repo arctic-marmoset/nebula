@@ -8,8 +8,8 @@ module decode_stage (
   input  logic              [31:0] pc_i,
   input  logic              [31:0] instruction_i,
   // Operand Read Signals
-  output register_t                rs1_address_o,
-  output register_t                rs2_address_o,
+  output register_e                rs1_address_o,
+  output register_e                rs2_address_o,
   // Control Flow Signals
   output logic                     jump_target_valid_o,
   output logic              [31:0] jump_target_o,
@@ -21,12 +21,12 @@ module decode_stage (
   // Writeback Signals
   output writeback_source_e        writeback_source_selector_o,
   output logic                     write_enable_o,
-  output register_t                rd_address_o
+  output register_e                rd_address_o
 );
   opcode_e opcode = opcode_e'(instruction_i[6:0]);
-  register_t rd_address = register_t'(instruction_i[11:7]);
-  register_t rs1_address = register_t'(instruction_i[19:15]);
-  register_t rs2_address = register_t'(instruction_i[24:20]);
+  register_e rd_address = register_e'(instruction_i[11:7]);
+  register_e rs1_address = register_e'(instruction_i[19:15]);
+  register_e rs2_address = register_e'(instruction_i[24:20]);
   wire [2:0] funct3 = instruction_i[14:12];
   wire [6:0] funct7 = instruction_i[31:25];
 

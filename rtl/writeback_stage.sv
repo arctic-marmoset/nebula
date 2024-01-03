@@ -6,7 +6,7 @@ module writeback_stage (
   input  logic                 [31:0] alu_result_i,
   input  logic                 [31:0] pc_next_sequential_i,
   input  logic                        write_enable_i,
-  input  register_t                   rd_address_i,
+  input  register_e                   rd_address_i,
   output register_file_write_t        write_o
 );
   logic [31:0] write_data;

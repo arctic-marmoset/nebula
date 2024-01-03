@@ -8,7 +8,7 @@ module register_file #(
   input  logic                        clk_i,
   input  logic                        rst_i,
   // Read Ports
-  input  register_t                   read_address_i[ ReadPortCount],
+  input  register_e                   read_address_i[ ReadPortCount],
   output logic                 [31:0] read_data_o   [ ReadPortCount],
   // Write Ports
   input  register_file_write_t        write_i       [WritePortCount]

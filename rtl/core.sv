@@ -1,5 +1,6 @@
 `include "alu_operand.svh"
 `include "common.svh"
+`include "forwarding.svh"
 `include "register_file.svh"
 `include "writeback.svh"
 
@@ -27,17 +28,7 @@ module core #(
     end
   end
 
-  wire decode_jump_target_valid;
-  wire execute_branch_target_valid;
-  wire kill_fetch;
-  wire kill_decode;
-  hazard_detection_unit hazard (
-    .decode_jump_target_valid_i   (decode_jump_target_valid),
-    .execute_branch_target_valid_i(execute_branch_target_valid),
-    .kill_fetch_o                 (kill_fetch),
-    .kill_decode_o                (kill_decode)
-  );
-
+  wire        kill_fetch;
   wire [31:0] fetch_pc = pc_q;
   wire [31:0] fetch_instruction;
   wire [31:0] fetch_pc_next_sequential = pc_next_sequential;
@@ -64,13 +55,15 @@ module core #(
     end
   end
 
+  wire                      kill_decode;
   wire               [31:0] decode_pc = fd_pc;
   wire               [31:0] decode_instruction = fd_instruction_q;
   writeback_source_e        decode_writeback_source_selector;
   wire                      decode_write_enable;
-  register_t                decode_rd_address;
-  register_t                decode_rs1_address;
-  register_t                decode_rs2_address;
+  register_e                decode_rd_address;
+  register_e                decode_rs1_address;
+  register_e                decode_rs2_address;
+  wire                      decode_jump_target_valid;
   wire               [31:0] decode_jump_target;
   alu_operand_a_e           decode_alu_operand_a_selector;
   alu_operand_b_e           decode_alu_operand_b_selector;
@@ -117,7 +110,9 @@ module core #(
   writeback_source_e        dx_writeback_source_selector;
   wire                      dx_write_enable_d = kill_decode ? 1'b0 : decode_write_enable;
   logic                     dx_write_enable_q;
-  register_t                dx_rd_address;
+  register_e                dx_rd_address;
+  register_e                dx_rs1_address;
+  register_e                dx_rs2_address;
   logic              [31:0] dx_rs1_data;
   logic              [31:0] dx_rs2_data;
   logic              [31:0] dx_immediate;
@@ -132,6 +127,8 @@ module core #(
       dx_writeback_source_selector <= WB_SRC_ALU;
       dx_write_enable_q            <= 1'b0;
       dx_rd_address                <= REG_ZERO;
+      dx_rs1_address               <= REG_ZERO;
+      dx_rs2_address               <= REG_ZERO;
       dx_rs1_data                  <= '0;
       dx_rs2_data                  <= '0;
       dx_immediate                 <= '0;
@@ -144,6 +141,8 @@ module core #(
       dx_writeback_source_selector <= decode_writeback_source_selector;
       dx_write_enable_q            <= dx_write_enable_d;
       dx_rd_address                <= decode_rd_address;
+      dx_rs1_address               <= decode_rs1_address;
+      dx_rs2_address               <= decode_rs2_address;
       dx_rs1_data                  <= decode_rs1_data;
       dx_rs2_data                  <= decode_rs2_data;
       dx_immediate                 <= decode_immediate;
@@ -154,15 +153,24 @@ module core #(
     end
   end
 
-  wire [31:0] execute_alu_result;
-  wire [31:0] execute_branch_target = execute_alu_result;
+  wire             [31:0] execute_alu_result;
+  wire                    execute_branch_target_valid;
+  wire             [31:0] execute_branch_target = execute_alu_result;
+  forward_source_e        execute_rs1_forward_source;
+  forward_source_e        execute_rs2_forward_source;
+  logic            [31:0] execute_forward_memory_data;
+  logic            [31:0] execute_forward_writeback_data;
   execute_stage execute (
     .alu_operand_a_selector_i(dx_alu_operand_a_selector),
+    .rs1_forward_source_i    (execute_rs1_forward_source),
     .rs1_data_i              (dx_rs1_data),
     .pc_i                    (dx_pc),
     .alu_operand_b_selector_i(dx_alu_operand_b_selector),
+    .rs2_forward_source_i    (execute_rs2_forward_source),
     .rs2_data_i              (dx_rs2_data),
     .immediate_i             (dx_immediate),
+    .forward_memory_data_i   (execute_forward_memory_data),
+    .forward_writeback_data_i(execute_forward_writeback_data),
     .alu_result_o            (execute_alu_result),
     .jump_i                  (dx_jump_q),
     .branch_target_valid_o   (execute_branch_target_valid)
@@ -170,7 +178,7 @@ module core #(
 
   writeback_source_e        xm_writeback_source_selector;
   logic                     xm_write_enable;
-  register_t                xm_rd_address;
+  register_e                xm_rd_address;
   logic              [31:0] xm_alu_result;
   logic              [31:0] xm_pc_next_sequential;
   always_ff @(posedge clk_i) begin
@@ -189,9 +197,11 @@ module core #(
     end
   end
 
+  assign execute_forward_memory_data = xm_alu_result;
+
   writeback_source_e        mw_writeback_source_selector;
   logic                     mw_write_enable;
-  register_t                mw_rd_address;
+  register_e                mw_rd_address;
   logic              [31:0] mw_alu_result;
   logic              [31:0] mw_pc_next_sequential;
   always_ff @(posedge clk_i) begin
@@ -222,6 +232,8 @@ module core #(
 
   assign register_file_write[0] = writeback_write;
 
+  assign execute_forward_writeback_data = writeback_write.data;
+
   always_comb begin
     if (decode_jump_target_valid) begin
       pc_d = decode_jump_target;
@@ -231,6 +243,24 @@ module core #(
       pc_d = pc_next_sequential;
     end
   end
+
+  hazard_detection_unit hazard (
+    .decode_jump_target_valid_i   (decode_jump_target_valid),
+    .execute_branch_target_valid_i(execute_branch_target_valid),
+    .kill_fetch_o                 (kill_fetch),
+    .kill_decode_o                (kill_decode)
+  );
+
+  forwarding_unit forward (
+    .dx_rs1_address_i            (dx_rs1_address),
+    .dx_rs2_address_i            (dx_rs2_address),
+    .xm_rd_address_valid_i       (xm_write_enable),
+    .xm_rd_address_i             (xm_rd_address),
+    .mw_rd_address_valid_i       (mw_write_enable),
+    .mw_rd_address_i             (mw_rd_address),
+    .execute_rs1_forward_source_o(execute_rs1_forward_source),
+    .execute_rs2_forward_source_o(execute_rs2_forward_source)
+  );
 
 `ifndef SYNTHESIS
   // Signals used for debugging.
