@@ -6,15 +6,7 @@ RTLDIR = rtl
 SIMDIR = sim
 TOP = core_tb
 
-SRC = \
-	rtl/core.sv \
-	rtl/fetch_stage.sv \
-	rtl/decode_stage.sv \
-	rtl/control_unit.sv \
-	rtl/immediate_generator.sv \
-	rtl/register_file.sv \
-	sim/core_tb.sv \
-	sim/clockgen.sv
+SRC = $(wildcard rtl/*.sv)
 
 TEST_NAME ?= add.S
 TEST_PATH := $(CURDIR)/test/$(TEST_NAME).hex
@@ -28,6 +20,7 @@ MODULE_DIRS = \
 VERILATORFLAGS = \
 	--binary \
 	-Wall \
+	-Wpedantic \
 	-Wno-fatal \
 	--trace-fst \
 	--timescale 1ns/1ns \

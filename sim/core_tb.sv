@@ -1,4 +1,5 @@
 `include "common.svh"
+`include "instructions.vh"
 
 `ifndef TEST_SIZE
 `define TEST_SIZE 0
@@ -43,4 +44,12 @@ module core_tb;
     .icache_read_data_i   (icache_data),
     .icache_read_address_o(icache_address)
   );
+
+  always_ff @(posedge clk) begin
+    if (!rst) begin
+      if (dut.mw_instruction_q == INSTRUCTION_WFI) begin
+        $finish;
+      end
+    end
+  end
 endmodule

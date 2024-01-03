@@ -1,16 +1,21 @@
 `include "alu_operand.svh"
 
 module execute_stage (
-  input alu_operand_a_e        alu_operand_a_selector_i,
-  input logic           [31:0] rs1_data_i,
-  input logic           [31:0] pc_i,
-
-  input alu_operand_b_e        alu_operand_b_selector_i,
-  input logic           [31:0] rs2_data_i,
-  input logic           [31:0] immediate_i,
-
-  output logic [31:0] alu_result_o
+  // Operand A Data Sources
+  input  alu_operand_a_e        alu_operand_a_selector_i,
+  input  logic           [31:0] rs1_data_i,
+  input  logic           [31:0] pc_i,
+  // Operand B Data Sources
+  input  alu_operand_b_e        alu_operand_b_selector_i,
+  input  logic           [31:0] rs2_data_i,
+  input  logic           [31:0] immediate_i,
+  // Result
+  output logic           [31:0] alu_result_o,
+  // Branch Signals
+  input  logic                  jump_i,
+  output logic                  branch_target_valid_o
 );
+  assign branch_target_valid_o = jump_i;
 
   logic [31:0] operand_a;
   always_comb begin

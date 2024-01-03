@@ -5,15 +5,22 @@ module register_file #(
   parameter unsigned ReadPortCount  = 2,
   parameter unsigned WritePortCount = 1
 ) (
-  input logic clk_i,
-  input logic rst_i,
-
-  input  logic [ 4:0] read_address_i[ReadPortCount],
-  output logic [31:0] read_data_o   [ReadPortCount],
-
-  input register_file_write_t write_i[WritePortCount]
+  input  logic                        clk_i,
+  input  logic                        rst_i,
+  // Read Ports
+  input  register_t                   read_address_i[ ReadPortCount],
+  output logic                 [31:0] read_data_o   [ ReadPortCount],
+  // Write Ports
+  input  register_file_write_t        write_i       [WritePortCount]
 );
   logic [31:0] registers[RegisterCount];
+`ifndef SYNTHESIS
+  initial begin
+    for (int i = 0; i < RegisterCount; ++i) begin
+      registers[i] = $urandom;
+    end
+  end
+`endif
 
   logic write_valid[WritePortCount];
   always_comb begin
@@ -24,9 +31,7 @@ module register_file #(
 
   always_ff @(posedge clk_i) begin
     if (rst_i) begin
-      for (int i = 0; i < RegisterCount; ++i) begin
-        registers[i] <= 0;
-      end
+      registers[REG_ZERO] <= '0;
     end else begin
       for (int i = 0; i < WritePortCount; ++i) begin
         if (write_valid[i]) begin
