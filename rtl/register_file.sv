@@ -15,20 +15,6 @@ module register_file #(
 );
   logic [31:0] registers[RegisterCount];
 
-`ifndef SYNTHESIS
-  initial begin
-    for (int i = 0; i < RegisterCount; ++i) begin
-      registers[i] = $urandom;
-    end
-  end
-`endif
-
-  always_ff @(posedge clk_i) begin
-    if (rst_i) begin
-      registers[0] <= 0;
-    end
-  end
-
   logic write_valid[WritePortCount];
   always_comb begin
     for (int i = 0; i < WritePortCount; ++i) begin
@@ -37,9 +23,15 @@ module register_file #(
   end
 
   always_ff @(posedge clk_i) begin
-    for (int i = 0; i < WritePortCount; ++i) begin
-      if (write_valid[i]) begin
-        registers[write_i[i].address] <= write_i[i].data;
+    if (rst_i) begin
+      for (int i = 0; i < RegisterCount; ++i) begin
+        registers[i] <= 0;
+      end
+    end else begin
+      for (int i = 0; i < WritePortCount; ++i) begin
+        if (write_valid[i]) begin
+          registers[write_i[i].address] <= write_i[i].data;
+        end
       end
     end
   end
@@ -48,7 +40,11 @@ module register_file #(
   always_comb begin
     for (int write_index = 0; write_index < WritePortCount; ++write_index) begin
       for (int read_index = 0; read_index < ReadPortCount; ++read_index) begin
-        if (write_valid[write_index] && read_address_i[read_index] != 'd0) begin
+        if (
+          write_valid[write_index] &&
+            read_address_i[read_index] != 'd0 &&
+            read_address_i[read_index] == write_i[write_index].address
+        ) begin
           read_data[read_index] = write_i[write_index].data;
         end else begin
           read_data[read_index] = registers[read_address_i[read_index]];

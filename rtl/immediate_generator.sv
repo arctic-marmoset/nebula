@@ -2,7 +2,7 @@
 
 module immediate_generator (
   input  logic       [31:0] instruction_i,
-  input  immediate_e        type_i,
+  input  immediate_e        selector_i,
   output logic       [31:0] immediate_o
 );
   /* verilator lint_off UNUSEDSIGNAL */
@@ -16,7 +16,7 @@ module immediate_generator (
   wire [31:0] j_type = {{12{instruction_i[31]}}, instruction_i[19:12], instruction_i[20], instruction_i[30:21], 1'b0};
 
   always_comb begin
-    case (type_i)
+    case (selector_i)
       default: immediate_o = i_type;
       IMM_S:   immediate_o = s_type;
       IMM_B:   immediate_o = b_type;

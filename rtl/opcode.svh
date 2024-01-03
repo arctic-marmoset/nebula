@@ -1,5 +1,5 @@
-`ifndef OPCODES_SVH
-`define OPCODES_SVH
+`ifndef OPCODE_SVH
+`define OPCODE_SVH
 
 typedef enum logic [6:0] {
   OP_AUIPC  = 7'b0010111,
